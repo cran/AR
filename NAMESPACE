@@ -1,0 +1,4 @@
+exportPattern("^[[:alpha:]]+")
+importFrom("graphics", "abline", "curve", "hist", "par", "mtext", "points", "title")
+importFrom("stats", "dunif", "optimize", "runif")
+importFrom("DISTRIB", "cdf", "pdf", "q", "rd")
