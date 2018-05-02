@@ -1,5 +1,5 @@
 AR.Sim <-
-function(n, f_X, Y.dist, Y.dist.par, xlim=c(0,1), S_X=xlim, Rej.Num=c("TRUE","FALSE"), Rej.Rate=c("TRUE","FALSE"), Acc.Rate=c("TRUE","FALSE") ){
+function(n, f_X, Y.dist, Y.dist.par, xlim=c(0,1), S_X=xlim, Rej.Num=TRUE, Rej.Rate=TRUE, Acc.Rate=TRUE ){
 options(warn=-1)
 x = c()
 k = 0  # Countur
@@ -8,7 +8,7 @@ c = optimize(f=function(x) f_X(x)/f_Y(x), interval=S_X, maximum=T)$objective
 c.max = optimize(f=function(x) f_X(x)/f_Y(x), interval=S_X, maximum=T)$maximum
 max.f_X = optimize(f_X, interval=S_X, maximum=T)$objective  #Is need for ylim in figures
 max.f_Y = optimize(f_Y, interval=S_X, maximum=T)$objective  #Is need for ylim in figures
-print( noquote(paste("Optimal c =", round(c,3)) ) )
+cat("Optimal c =", round(c,3), fill=TRUE )
 
 par(mfrow=c(3,1), oma=c(1.5, 4, 1.3, 0), mar=rep(1.2, 4), cex=.9, las=1)
 curve(f_X(x), col=1, lwd=2, lty=1, xlim=xlim, ylim=c(0, .1+ max(c, max.f_X, max.f_Y)))
@@ -63,11 +63,12 @@ mtext("f_X(y)       ", font=4, col=1, side=2, padj=16, outer=T)  #For ylab of Fi
 mtext("Points  (y ,  u. c. f_Y(y))                     Points  (y , u)               Computing the optimum c", 4, 0, outer=F, las=0)  #For ylab in right side
 
 if(Rej.Num != "FALSE")  
-   print( noquote(paste("The numbers of Rejections =", k-n ) ) )
+   cat( "The numbers of Rejections =", k-n, fill=TRUE )
 if(Rej.Rate != "FALSE") 
-   print( noquote(paste("Ratio of Rejections =", round((k-n)/k, 3) ) ) )
+   cat( "Ratio of Rejections =", round((k-n)/k, 3), fill=TRUE )
 if(Acc.Rate != "FALSE")  
-   print( noquote(paste("Ratio of Acceptance =", 1-round((k-n)/k, 3) ) ) )
+   cat( "Ratio of Acceptance =", 1-round((k-n)/k, 3), fill=TRUE )
+
 Sim.data <- x
 return(Sim.data)
 }

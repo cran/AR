@@ -29,8 +29,8 @@ and it means that after omitting the extra/red random darts/points from the boar
 }
 
 \usage{
-AR.Sim(n, f_X, Y.dist, Y.dist.par, xlim = c(0, 1), S_X = xlim, Rej.Num = c("TRUE",
-       "FALSE"), Rej.Rate = c("TRUE", "FALSE"), Acc.Rate = c("TRUE", "FALSE"))
+AR.Sim(n, f_X, Y.dist, Y.dist.par, xlim = c(0, 1), S_X = xlim, Rej.Num = TRUE,
+       Rej.Rate = TRUE, Acc.Rate = TRUE)
 }
 \arguments{
   \item{n}{
@@ -148,96 +148,6 @@ hist(Sim1, prob=TRUE, col="lightgreen")
 curve(f_X(x), add=TRUE, col=2, lty=2, lwd=3) # Truncated pdf of N(5,2^2) at l and r
 c2 = 1 / (pnorm(r,mu,sigma)-pnorm(l,mu,sigma)) ; c2 #See page 15 jozve
 
-
-
-
-## The function is currently defined as
-function (n, f_X, Y.dist, Y.dist.par, xlim = c(0, 1), S_X = xlim, 
-    Rej.Num = c("TRUE", "FALSE"), Rej.Rate = c("TRUE", "FALSE"), 
-    Acc.Rate = c("TRUE", "FALSE")) 
-{
-    options(warn = -1)
-    x = c()
-    k = 0
-    f_Y <- function(x) pdf(T.dist = Y.dist, T.dist.par = Y.dist.par, 
-        x)
-    c = optimize(f = function(x) f_X(x)/f_Y(x), interval = S_X, 
-        maximum = T)$objective
-    c.max = optimize(f = function(x) f_X(x)/f_Y(x), interval = S_X, 
-        maximum = T)$maximum
-    max.f_X = optimize(f_X, interval = S_X, maximum = T)$objective
-    max.f_Y = optimize(f_Y, interval = S_X, maximum = T)$objective
-    print(noquote(paste("Optimal c =", round(c, 3))))
-    par(mfrow = c(3, 1), oma = c(1.5, 4, 1.3, 0), mar = rep(1.2, 
-        4), cex = 0.9, las = 1)
-    curve(f_X(x), col = 1, lwd = 2, lty = 1, xlim = xlim, ylim = c(0, 
-        0.1 + max(c, max.f_X, max.f_Y)))
-    curve(f_Y(x), col = "coral1", lwd = 2, lty = 1, add = T)
-    curve(f_X(x)/f_Y(x), lwd = 2, lty = 1, col = 4, add = T)
-    abline(h = c, v = c.max, col = 4, lty = 3)
-    curve(dunif(x), xlim = xlim, ylim = c(0, 1.1), lwd = 2)
-    curve(f_X(x)/(c * f_Y(x)), xlim = xlim, col = 4, lty = 2, 
-        lwd = 2, add = T)
-    Y <- U <- c()
-    while (length(x) < n) {
-        k = k + 1
-        u = runif(1)
-        y = rd(1, T.dist = Y.dist, T.dist.par = Y.dist.par)
-        Y = c(Y, y)
-        U = c(U, u)
-        if (u <= f_X(y)/(c * f_Y(y))) {
-            x = c(x, y)
-            points(y, u, type = "p", pch = 20, col = 3, add = T)
-        }
-        else {
-            points(y, u, type = "p", pch = 20, col = 2, add = T)
-        }
-    }
-    curve(c * f_Y(x), col = "coral1", xlim = xlim, ylim = c(0, 
-        0.02 + max(max.f_X, c * max.f_Y)), lty = 2, lwd = 2)
-    curve(f_X(x), xlim = xlim, col = 1, lty = 2, lwd = 2, add = T)
-    points(Y, U * c * f_Y(Y), type = "p", pch = 20, add = T, 
-        col = 3 * (U <= f_X(Y)/(c * f_Y(Y))) + 2 * (U > f_X(Y)/(c * 
-            f_Y(Y))))
-    title("Graphical Presentation to Acceptance-Rejection Method          ", 
-        outer = TRUE)
-    par(mfcol = c(1, 1))
-    mtext("f_X(x)       ", font = 4, col = 1, side = 2, padj = -19, 
-        outer = T)
-    mtext("f_Y(x)       ", font = 4, col = "coral1", side = 2, 
-        padj = -17, outer = T)
-    mtext("f_X(x)       ", font = 4, col = 4, side = 2, padj = -14, 
-        outer = T)
-    mtext("---------       ", font = 4, col = 4, side = 2, padj = -13, 
-        outer = T)
-    mtext("f_Y(x)       ", font = 4, col = 4, side = 2, padj = -12, 
-        outer = T)
-    mtext("f_U(y)       ", font = 4, col = 1, side = 2, padj = -2, 
-        outer = T)
-    mtext("f_X(y)       ", font = 4, col = 4, side = 2, padj = 1, 
-        outer = T)
-    mtext("----------      ", font = 4, col = 4, side = 2, padj = 2, 
-        outer = T)
-    mtext("c. f_Y(y)   ", font = 4, col = 4, side = 2, padj = 3, 
-        outer = T)
-    mtext("c. f_Y(y)    ", font = 4, col = "coral1", side = 2, 
-        padj = 14, outer = T)
-    mtext("f_X(y)       ", font = 4, col = 1, side = 2, padj = 16, 
-        outer = T)
-    mtext("Points  (y ,  u. c. f_Y(y))                     Points  (y , u)    
-            Computing the optimum c",         4, 0, outer = F, las = 0)
-    if (Rej.Num != "FALSE") 
-        print(noquote(paste("The numbers of Rejections =", k - 
-            n)))
-    if (Rej.Rate != "FALSE") 
-        print(noquote(paste("Ratio of Rejections =", round((k - 
-            n)/k, 3))))
-    if (Acc.Rate != "FALSE") 
-        print(noquote(paste("Ratio of Acceptance =", 1 - round((k - 
-            n)/k, 3))))
-    Sim.data <- x
-    return(Sim.data)
-  }
 }
 
 \keyword{ DISTRIB }
